@@ -8,79 +8,108 @@ import psutil
 import glob
 
 baseDir = os.getcwd()
-#baseDir = r'C:\Users\Owner\Downloads\TC'
-charsDir = baseDir + r'\chars'
-players = os.listdir(charsDir)
+os.chdir(baseDir) # simply setting our working directory explicitly. Unsure if this is needed.
 
-stagesDir = baseDir + r'\stages'
-os.chdir(stagesDir)
-stages = glob.glob('*.def')
-os.chdir(baseDir)
+charsDir = baseDir + r'\chars' # folder that holds all the figher files
+players = os.listdir(charsDir) # an array of all fighter names
+numPlayers = len(players)
 
-p1p = 0
-p2p = 1
+stagesDir = baseDir + r'\stages' # stages folder
+os.chdir(stagesDir) # change our working directory temporarily to use glob
+stages = glob.glob('*.def') # this gets all ".def" files in the stages folder
+os.chdir(baseDir) # revert our working directory
 
-p1 = players[p1p]
-p2 = players[p2p]
+p1i = 0 # player 1's array index
+p2i = 1 # player 2's array index
 
 base_address = 0x00400000 # mugen.exe
 win_address_offset = 0x001040E8 # offset for above, points to actual win address
 red_offset = 0x0000871C # offset for win_address (not win_address_offset), points to P1 wins
 blue_offset = 0x00008728 # offset for win_address (not win_address_offset), points to P2 wins
 
+# set our 1st two fighters
+p1Name = players[p1i]
+p2Name = players[p2i]
+
+# This loop advances only when the fighters change pairings
+# It picks a random stage, 
+# starts the fight, 
+# monitors the fight for the winner in an inner loop,
+# loser is eliminated, 
+# replacement fighter is chosen, 
+# loop advances
 while True:
 
     stage = random.choice(stages)
     stageCharacterLength = len(stage)
-    stage = stage[0:stageCharacterLength - 4] # removes 4 char file extension
 
     #os.chdir("C:\\Users\\Owner\\Downloads\\TC\\")
-    subprocess.Popen("TC.exe -p1 \"" + p1 + "\" -p2 \"" + p2 +"\"" + "-rounds 2 -p1.life 1200 -p2.life 1200 -p1.ai 9 -p2.ai 9 -s \"" + stage + "\"")
+    subprocess.Popen("TC.exe -p1 \"" + p1Name + "\" -p2 \"" + p2Name +"\"" + "-rounds 2 -p1.life 1200 -p2.life 1200 -p1.ai 9 -p2.ai 9 -s \"" + stage + "\"")
 
-    time.sleep(1)
+    time.sleep(1) # sleep for a second after opening the process before hooking in
     pm = pymem.Pymem("TC.exe")
-    print(p1 + ' - vs - ' + p2)
+    
+    print(p1Name + ' - vs - ' + p2Name)
     pid = pm.process_id
 
+    # calculating our addresses
     win_address = pm.read_int(base_address + win_address_offset)
     p1_win_address = win_address + red_offset
     p2_win_address = win_address + blue_offset
 
+    # before each fight set each fighters wins to zero
     P1Wins = 0
     P2Wins = 0
 
+    # every 0.5 seconds check to see if the mugen process is running
+    # if it's not running, that means the fight is over beacuse
+    # mugen auto closes itself after a fight completes
     while psutil.pid_exists(pid):
-        time.sleep(0.5)
+        # try to read values from memory.
+        # target process can close at any time, so wrap it in try
         try:
             temp = pm.read_int(p1_win_address)
             temp2 = pm.read_int(p2_win_address)
-            if temp != P1Wins and temp <= 2:
-                print('p1 wins round')
+            if temp != P1Wins and temp <= 2: # if we successfully read both values, let's save them
+                print(p1Name + ' wins round')
                 P1Wins = temp
             if temp2 != P2Wins and temp2 <= 2:
-                print('p2 wins round')
+                print(p2Name + ' wins round')
                 P2Wins = temp2
         except:
             continue
+        time.sleep(0.5) # sleep 5 seconds
     
     print(str(P1Wins) + ' : ' + str(P2Wins))
     if P1Wins == P2Wins:
         print('Tie! Rematch!')
     elif P1Wins > P2Wins:
-        print(p1 + ' wins')
-        if p1p < p2p:
-            p2p += 1
-            p2 = players[p2p]
-        elif p2p < p1p:
-            p2p = p1p + 1
-            p2 = players[p2p]
+        print(p1Name + ' wins')
+        if p1i < p2i:
+            p2i += 1
+            if p2i > numPlayers:
+                print('Done!')
+                exit
+            p2Name = players[p2i]
+        elif p2i < p1i:
+            p2i = p1i + 1
+            if p2i > numPlayers:
+                print('Done!')
+                exit
+            p2Name = players[p2i]
     else:
-        print(p2 + ' wins')
-        if p1p < p2p:
-            p1p = p2p + 1
-            p1 = players[p1p]
-        elif p2p < p1p:
-            p1p += 1
-            p1 = players[p1p]
+        print(p2Name + ' wins')
+        if p1i < p2i:
+            p1i = p2i + 1
+            if p1i > numPlayers:
+                print('Done!')
+                exit
+            p1Name = players[p1i]
+        elif p2i < p1i:
+            p1i += 1
+            if p1i > numPlayers:
+                print('Done!')
+                exit
+            p1Name = players[p1i]
     print('')
 

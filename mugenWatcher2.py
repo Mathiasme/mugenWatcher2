@@ -83,6 +83,7 @@ while True:
     # Printing fight results after a winner is determined
     # Below is the logic for eliminating the loser and finding a replacement
     # We just keep sliding the pointer indexes to the right, going through every character
+    # If the index of the new fighter is >= the number of players, terminate program
     print(str(P1Wins) + ' : ' + str(P2Wins))
     if P1Wins == P2Wins:
         print('Tie! Rematch!')
@@ -90,13 +91,13 @@ while True:
         print(p1Name + ' wins')
         if p1i < p2i:
             p2i += 1
-            if p2i > numPlayers:
+            if p2i >= numPlayers:
                 print('Done!')
                 exit
             p2Name = players[p2i]
         elif p2i < p1i:
             p2i = p1i + 1
-            if p2i > numPlayers:
+            if p2i >= numPlayers:
                 print('Done!')
                 exit
             p2Name = players[p2i]
@@ -104,15 +105,15 @@ while True:
         print(p2Name + ' wins')
         if p1i < p2i:
             p1i = p2i + 1
-            if p1i > numPlayers:
+            if p1i >= numPlayers:
                 print('Done!')
                 exit
             p1Name = players[p1i]
         elif p2i < p1i:
             p1i += 1
-            if p1i > numPlayers:
+            if p1i >= numPlayers:
                 print('Done!')
                 exit
             p1Name = players[p1i]
-    print('--------------') # a spacer to make things more readable between fights
+    print('--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight
 

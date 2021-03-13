@@ -43,11 +43,11 @@ while True:
     stage = random.choice(stages)
     stageCharacterLength = len(stage)
 
-    #os.chdir("C:\\Users\\Owner\\Downloads\\TC\\")
-    subprocess.Popen("TC.exe -p1 \"" + p1Name + "\" -p2 \"" + p2Name +"\"" + "-rounds 2 -p1.life 1200 -p2.life 1200 -p1.ai 9 -p2.ai 9 -s \"" + stage + "\"")
+    # open our
+    subprocess.Popen("mugen.exe -p1 \"" + p1Name + "\" -p2 \"" + p2Name +"\"" + "-rounds 2 -p1.life 1200 -p2.life 1200 -p1.ai 9 -p2.ai 9 -s \"" + stage + "\"")
 
     time.sleep(1) # sleep for a second after opening the process before hooking in
-    pm = pymem.Pymem("TC.exe")
+    pm = pymem.Pymem("mugen.exe")
     
     print(p1Name + ' - vs - ' + p2Name)
     pid = pm.process_id
@@ -80,6 +80,7 @@ while True:
             continue
         time.sleep(0.5) # sleep 5 seconds
     
+    # Printing fight results after a winner is determined
     print(str(P1Wins) + ' : ' + str(P2Wins))
     if P1Wins == P2Wins:
         print('Tie! Rematch!')
@@ -111,5 +112,5 @@ while True:
                 print('Done!')
                 exit
             p1Name = players[p1i]
-    print('')
+    print('--------------') # a spacer to make things more readable between fights
 

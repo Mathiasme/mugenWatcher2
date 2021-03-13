@@ -43,7 +43,7 @@ while True:
     stage = random.choice(stages)
     stageCharacterLength = len(stage)
 
-    # open our
+    # open our target process with the fight parameters
     subprocess.Popen("mugen.exe -p1 \"" + p1Name + "\" -p2 \"" + p2Name +"\"" + "-rounds 2 -p1.life 1200 -p2.life 1200 -p1.ai 9 -p2.ai 9 -s \"" + stage + "\"")
 
     time.sleep(1) # sleep for a second after opening the process before hooking in
@@ -81,10 +81,12 @@ while True:
         time.sleep(0.5) # sleep 5 seconds
     
     # Printing fight results after a winner is determined
+    # Below is the logic for eliminating the loser and finding a replacement
+    # We just keep sliding the pointer indexes to the right, going through every character
     print(str(P1Wins) + ' : ' + str(P2Wins))
     if P1Wins == P2Wins:
         print('Tie! Rematch!')
-    elif P1Wins > P2Wins:
+    elif P1Wins > P2Wins: 
         print(p1Name + ' wins')
         if p1i < p2i:
             p2i += 1

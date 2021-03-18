@@ -106,4 +106,4 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
                     fightHistoryArea.insert(tk.END, 'Done!' + '\n')
                     sys.exit()
                 p1Name = players[p1i]
-        fightHistoryArea.insert(tk.END, '--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight
+        fightHistoryArea.insert(tk.END, '--------------\n') # a spacer to make things more readable between fights, we now loop back to start a new fight

@@ -4,3 +4,4 @@ venv
 mugen.log
 mugen.spec
 dist
+debug.txt

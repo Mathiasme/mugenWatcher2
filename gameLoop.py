@@ -1,50 +1,17 @@
 from pymem import Pymem
-import pymem.process
-import os
-import time
-import subprocess
-import random
-import psutil
-import glob
-import sys
-import logging
 from tkinter import *
 
-fightHistory = Tk()
-fightHistory.title('Fight History')
-fightHistory.geometry('705x255')
-fightHistory.configure(background='ivory3')
+import time
+import subprocess
+import pymem.process
+import random
+import logging
+import sys
 
-fightHistoryTextBox = Text(fightHistory, height = 250, width = 700)
-fightHistoryTextBox.pack()
-fightHistory.update()
+import infoWindowFrame as iwf
+import fightHistoryArea as fha
 
-def Main():
-    logging.basicConfig(filename='debug.txt', encoding='utf-8', level=logging.DEBUG)
-
-    baseDir = os.getcwd()
-    os.chdir(baseDir) # simply setting our working directory explicitly. Unsure if this is needed.
-
-    charsDir = baseDir + r'\chars' # folder that holds all the figher files
-    players = os.listdir(charsDir) # an array of all fighter names
-    numPlayers = len(players)
-
-    stagesDir = baseDir + r'\stages' # stages folder
-    os.chdir(stagesDir) # change our working directory temporarily to use glob
-    stages = glob.glob('*.def') # this gets all ".def" files in the stages folder
-    os.chdir(baseDir) # revert our working directory
-
-    p1i = 0 # player 1's array index
-    p2i = 1 # player 2's array index
-
-    base_address = 0x00400000 # mugen.exe
-    win_address_offset = 0x001040E8 # offset for above, points to actual win address
-    red_offset = 0x0000871C # offset for win_address (not win_address_offset), points to P1 wins
-    blue_offset = 0x00008728 # offset for win_address (not win_address_offset), points to P2 wins
-
-    # set our 1st two fighters
-    p1Name = players[p1i]
-    p2Name = players[p2i]
+def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, base_address, win_address_offset, red_offset, blue_offset, numPlayers, players):
 
     # This loop advances only when the fighters change pairings
     # It picks a random stage, 
@@ -64,7 +31,7 @@ def Main():
         pm = pymem.Pymem("mugen.exe")
 
         logging.debug(p1Name + ' - vs - ' + p2Name)
-        fightHistoryTextBox.insert(END, p1Name + ' - vs - ' + p2Name)
+        fightHistoryArea.insert(END, p1Name + ' - vs - ' + p2Name)
 
         # calculating our addresses
         win_address = pm.read_int(base_address + win_address_offset)
@@ -93,7 +60,7 @@ def Main():
             except:
                 logging.debug(sys.exc_info()[0])
                 break
-            fightHistory.update()
+            infoWindowFrame.update()
             time.sleep(0.5) # sleep 0.5 seconds
         
         # Printing fight results after a winner is determined
@@ -105,7 +72,7 @@ def Main():
             logging.debug('Tie! Rematch!')        
         elif P1Wins > P2Wins: 
             logging.debug(p1Name + ' wins')
-            fightHistoryTextBox.insert(END, ' --- ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
+            fightHistoryArea.insert(END, ' --- ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p2i += 1
                 if p2i >= numPlayers:
@@ -120,7 +87,7 @@ def Main():
                 p2Name = players[p2i]
         else:
             logging.debug(p2Name + ' wins')
-            fightHistoryTextBox.insert(END, ' - ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
+            fightHistoryArea.insert(END, ' - ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p1i = p2i + 1
                 if p1i >= numPlayers:
@@ -134,6 +101,3 @@ def Main():
                     exit
                 p1Name = players[p1i]
         logging.debug('--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight
-
-if __name__=='__main__':
-    Main()

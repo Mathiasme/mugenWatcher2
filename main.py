@@ -1,9 +1,11 @@
 import os
 import glob
 import logging
+
 import infoWindowFrame as iwf
 import fightHistoryArea as fha
 import gameLoop as gl
+import debugOutputArea as doa
 
 logging.basicConfig(filename='debug.txt', encoding='utf-8', level=logging.DEBUG)
 
@@ -35,4 +37,5 @@ p2Name = players[p2i]
 if __name__ == '__main__':
     infoWindowFrame = iwf.createFrame()
     fightHistoryArea = fha.create(infoWindowFrame)
-    gl.start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, base_address, win_address_offset, red_offset, blue_offset, numPlayers, players)
+    debugOutputArea = doa.create(infoWindowFrame)
+    gl.start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, base_address, win_address_offset, red_offset, blue_offset, numPlayers, players, debugOutputArea)

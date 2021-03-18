@@ -89,7 +89,7 @@ while True:
     # Below is the logic for eliminating the loser and finding a replacement
     # We just keep sliding the pointer indexes to the right, going through every character
     # If the index of the new fighter is >= the number of players, terminate program
-    print(str(P1Wins) + ' : ' + str(P2Wins))
+    logging.debug(str(P1Wins) + ' : ' + str(P2Wins))
     if P1Wins == P2Wins:
         logging.debug('Tie! Rematch!')        
     elif P1Wins > P2Wins: 

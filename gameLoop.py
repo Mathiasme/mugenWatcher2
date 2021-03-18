@@ -1,5 +1,3 @@
-from pymem import Pymem
-from tkinter import *
 
 import time
 import subprocess
@@ -8,6 +6,8 @@ import random
 import logging
 import sys
 import psutil
+import pymem
+import tkinter as tk
 
 import infoWindowFrame as iwf
 import fightHistoryArea as fha
@@ -32,7 +32,7 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
         pm = pymem.Pymem("mugen.exe")
         pid = pm.process_id
 
-        fightHistoryArea.insert(END, p1Name + ' - vs - ' + p2Name + '\n')
+        fightHistoryArea.insert(tk.END, p1Name + ' - vs - ' + p2Name + '\n')
 
         # calculating our addresses, win_address changes each time mugen.exe is re-run (after every matchup)
         win_address = pm.read_int(base_address + win_address_offset)
@@ -53,10 +53,10 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
                 temp = pm.read_int(p1_win_address)
                 temp2 = pm.read_int(p2_win_address)         
                 if temp != P1Wins and temp <= 2 and temp != 0: # if we successfully read both values, let's save them
-                    fightHistoryArea.insert(END, p1Name + ' wins round' + '\n')                
+                    fightHistoryArea.insert(tk.END, p1Name + ' wins round' + '\n')                
                     P1Wins = temp
                 if temp2 != P2Wins and temp2 <= 2 and temp2 != 0:
-                    fightHistoryArea.insert(END, p2Name + ' wins round' + '\n')                
+                    fightHistoryArea.insert(tk.END, p2Name + ' wins round' + '\n')                
                     P2Wins = temp2
             except:
                 logging.debug(sys.exc_info()[0])
@@ -73,37 +73,37 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
         # Below is the logic for eliminating the loser and finding a replacement
         # We just keep sliding the pointer indexes to the right, going through every character
         # If the index of the new fighter is >= the number of players, terminate program
-        fightHistoryArea.insert(END, str(P1Wins) + ' : ' + str(P2Wins) + '\n')
+        fightHistoryArea.insert(tk.END, str(P1Wins) + ' : ' + str(P2Wins) + '\n')
         if P1Wins == P2Wins:
-            fightHistoryArea.insert(END, 'Tie! Rematch!' + '\n')
+            fightHistoryArea.insert(tk.END, 'Tie! Rematch!' + '\n')
         elif P1Wins > P2Wins: 
-            fightHistoryArea.insert(END, p1Name + ' wins' + '\n')
-            fightHistoryArea.insert(END, ' --- ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
+            fightHistoryArea.insert(tk.END, p1Name + ' wins' + '\n')
+            fightHistoryArea.insert(tk.END, ' --- ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p2i += 1
                 if p2i >= numPlayers:
-                    fightHistoryArea.insert(END, 'Done!' + '\n')
+                    fightHistoryArea.insert(tk.END, 'Done!' + '\n')
                     sys.exit()
                 p2Name = players[p2i]
             elif p2i < p1i:
                 p2i = p1i + 1
                 if p2i >= numPlayers:
-                    fightHistoryArea.insert(END, 'Done!' + '\n')
+                    fightHistoryArea.insert(tk.END, 'Done!' + '\n')
                     sys.exit()
                 p2Name = players[p2i]
         else:
-            fightHistoryArea.insert(END, p2Name + ' wins')
-            fightHistoryArea.insert(END, ' - ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
+            fightHistoryArea.insert(tk.END, p2Name + ' wins')
+            fightHistoryArea.insert(tk.END, ' - ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p1i = p2i + 1
                 if p1i >= numPlayers:
-                    fightHistoryArea.insert(END, 'Done!' + '\n')
+                    fightHistoryArea.insert(tk.END, 'Done!' + '\n')
                     sys.exit()
                 p1Name = players[p1i]
             elif p2i < p1i:
                 p1i += 1
                 if p1i >= numPlayers:
-                    fightHistoryArea.insert(END, 'Done!' + '\n')
+                    fightHistoryArea.insert(tk.END, 'Done!' + '\n')
                     sys.exit()
                 p1Name = players[p1i]
-        fightHistoryArea.insert(END, '--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight
+        fightHistoryArea.insert(tk.END, '--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight

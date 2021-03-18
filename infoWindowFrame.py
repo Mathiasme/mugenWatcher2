@@ -1,7 +1,7 @@
-from tkinter import *
+import tkinter
 
 def createFrame():
-    infoWindow = Tk()
+    infoWindow = tkinter.Tk()
     infoWindow.title('MUGEN Info')
     infoWindow.geometry('1280x720')
     infoWindow.configure(background='ivory3')

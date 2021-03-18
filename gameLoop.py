@@ -7,6 +7,7 @@ import pymem.process
 import random
 import logging
 import sys
+import psutil
 
 import infoWindowFrame as iwf
 import fightHistoryArea as fha
@@ -60,7 +61,13 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
             except:
                 logging.debug(sys.exc_info()[0])
                 break
-            infoWindowFrame.update()
+            try:  
+                infoWindowFrame.update()
+            except:
+                logging.debug('User closed window, terminating program & mugen...')
+                p = psutil.Process(pid)
+                p.terminate()  #or p.kill()
+                sys.exit()
             time.sleep(0.5) # sleep 0.5 seconds
         
         # Printing fight results after a winner is determined
@@ -77,13 +84,13 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
                 p2i += 1
                 if p2i >= numPlayers:
                     logging.debug('Done!')                
-                    exit
+                    sys.exit()
                 p2Name = players[p2i]
             elif p2i < p1i:
                 p2i = p1i + 1
                 if p2i >= numPlayers:
                     logging.debug('Done!')                
-                    exit
+                    sys.exit()
                 p2Name = players[p2i]
         else:
             logging.debug(p2Name + ' wins')
@@ -92,12 +99,12 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
                 p1i = p2i + 1
                 if p1i >= numPlayers:
                     logging.debug('Done!')                
-                    exit
+                    sys.exit()
                 p1Name = players[p1i]
             elif p2i < p1i:
                 p1i += 1
                 if p1i >= numPlayers:
                     logging.debug('Done!')                
-                    exit
+                    sys.exit()
                 p1Name = players[p1i]
         logging.debug('--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight

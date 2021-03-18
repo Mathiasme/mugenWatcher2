@@ -78,7 +78,6 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
             fightHistoryArea.insert(tk.END, 'Tie! Rematch!' + '\n')
         elif P1Wins > P2Wins: 
             fightHistoryArea.insert(tk.END, p1Name + ' wins' + '\n')
-            fightHistoryArea.insert(tk.END, str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p2i += 1
                 if p2i >= numPlayers:
@@ -93,7 +92,6 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
                 p2Name = players[p2i]
         else:
             fightHistoryArea.insert(tk.END, p2Name + ' wins')
-            fightHistoryArea.insert(tk.END, ' - ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p1i = p2i + 1
                 if p1i >= numPlayers:

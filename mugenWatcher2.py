@@ -8,6 +8,7 @@ import psutil
 import glob
 import sys
 import logging
+
 logging.basicConfig(filename='debug.txt', encoding='utf-8', level=logging.DEBUG)
 
 baseDir = os.getcwd()
@@ -51,7 +52,7 @@ while True:
 
     time.sleep(1) # sleep for a second after opening the process before hooking in
     pm = pymem.Pymem("mugen.exe")
-    
+
     logging.debug(p1Name + ' - vs - ' + p2Name)
     pid = pm.process_id
 

@@ -12,7 +12,7 @@ import psutil
 import infoWindowFrame as iwf
 import fightHistoryArea as fha
 
-def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, base_address, win_address_offset, red_offset, blue_offset, numPlayers, players):
+def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, base_address, win_address_offset, red_offset, blue_offset, numPlayers, players, debugOutputArea):
 
     # This loop advances only when the fighters change pairings
     # It picks a random stage, 
@@ -30,11 +30,11 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
 
         time.sleep(1) # sleep for a second after opening the process before hooking in
         pm = pymem.Pymem("mugen.exe")
+        pid = pm.process_id
 
-        logging.debug(p1Name + ' - vs - ' + p2Name)
-        fightHistoryArea.insert(END, p1Name + ' - vs - ' + p2Name)
+        fightHistoryArea.insert(END, p1Name + ' - vs - ' + p2Name + '\n')
 
-        # calculating our addresses
+        # calculating our addresses, win_address changes each time mugen.exe is re-run (after every matchup)
         win_address = pm.read_int(base_address + win_address_offset)
         p1_win_address = win_address + red_offset
         p2_win_address = win_address + blue_offset
@@ -53,10 +53,10 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
                 temp = pm.read_int(p1_win_address)
                 temp2 = pm.read_int(p2_win_address)         
                 if temp != P1Wins and temp <= 2 and temp != 0: # if we successfully read both values, let's save them
-                    logging.debug(p1Name + ' wins round')                
+                    fightHistoryArea.insert(END, p1Name + ' wins round' + '\n')                
                     P1Wins = temp
                 if temp2 != P2Wins and temp2 <= 2 and temp2 != 0:
-                    logging.debug(p2Name + ' wins round')                
+                    fightHistoryArea.insert(END, p2Name + ' wins round' + '\n')                
                     P2Wins = temp2
             except:
                 logging.debug(sys.exc_info()[0])
@@ -64,7 +64,6 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
             try:  
                 infoWindowFrame.update()
             except:
-                logging.debug('User closed window, terminating program & mugen...')
                 p = psutil.Process(pid)
                 p.terminate()  #or p.kill()
                 sys.exit()
@@ -74,37 +73,37 @@ def start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, b
         # Below is the logic for eliminating the loser and finding a replacement
         # We just keep sliding the pointer indexes to the right, going through every character
         # If the index of the new fighter is >= the number of players, terminate program
-        logging.debug(str(P1Wins) + ' : ' + str(P2Wins))
+        fightHistoryArea.insert(END, str(P1Wins) + ' : ' + str(P2Wins) + '\n')
         if P1Wins == P2Wins:
-            logging.debug('Tie! Rematch!')        
+            fightHistoryArea.insert(END, 'Tie! Rematch!' + '\n')
         elif P1Wins > P2Wins: 
-            logging.debug(p1Name + ' wins')
+            fightHistoryArea.insert(END, p1Name + ' wins' + '\n')
             fightHistoryArea.insert(END, ' --- ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p2i += 1
                 if p2i >= numPlayers:
-                    logging.debug('Done!')                
+                    fightHistoryArea.insert(END, 'Done!' + '\n')
                     sys.exit()
                 p2Name = players[p2i]
             elif p2i < p1i:
                 p2i = p1i + 1
                 if p2i >= numPlayers:
-                    logging.debug('Done!')                
+                    fightHistoryArea.insert(END, 'Done!' + '\n')
                     sys.exit()
                 p2Name = players[p2i]
         else:
-            logging.debug(p2Name + ' wins')
+            fightHistoryArea.insert(END, p2Name + ' wins')
             fightHistoryArea.insert(END, ' - ' + str(P1Wins) + ':' + str(P2Wins) + '\n')
             if p1i < p2i:
                 p1i = p2i + 1
                 if p1i >= numPlayers:
-                    logging.debug('Done!')                
+                    fightHistoryArea.insert(END, 'Done!' + '\n')
                     sys.exit()
                 p1Name = players[p1i]
             elif p2i < p1i:
                 p1i += 1
                 if p1i >= numPlayers:
-                    logging.debug('Done!')                
+                    fightHistoryArea.insert(END, 'Done!' + '\n')
                     sys.exit()
                 p1Name = players[p1i]
-        logging.debug('--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight
+        fightHistoryArea.insert(END, '--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight

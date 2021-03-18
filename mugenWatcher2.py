@@ -6,6 +6,9 @@ import subprocess
 import random
 import psutil
 import glob
+import sys
+import logging
+logging.basicConfig(filename='debug.txt', encoding='utf-8', level=logging.DEBUG)
 
 baseDir = os.getcwd()
 os.chdir(baseDir) # simply setting our working directory explicitly. Unsure if this is needed.
@@ -49,7 +52,7 @@ while True:
     time.sleep(1) # sleep for a second after opening the process before hooking in
     pm = pymem.Pymem("mugen.exe")
     
-    print(p1Name + ' - vs - ' + p2Name)
+    logging.debug(p1Name + ' - vs - ' + p2Name)
     pid = pm.process_id
 
     # calculating our addresses
@@ -64,21 +67,22 @@ while True:
     # every 0.5 seconds check to see if the mugen process is running
     # if it's not running, that means the fight is over beacuse
     # mugen auto closes itself after a fight completes
-    while psutil.pid_exists(pid):
+    while True:
         # try to read values from memory.
         # target process can close at any time, so wrap it in try
         try:
             temp = pm.read_int(p1_win_address)
-            temp2 = pm.read_int(p2_win_address)
-            if temp != P1Wins and temp <= 2: # if we successfully read both values, let's save them
-                print(p1Name + ' wins round')
+            temp2 = pm.read_int(p2_win_address)         
+            if temp != P1Wins and temp <= 2 and temp != 0: # if we successfully read both values, let's save them
+                logging.debug(p1Name + ' wins round')                
                 P1Wins = temp
-            if temp2 != P2Wins and temp2 <= 2:
-                print(p2Name + ' wins round')
+            if temp2 != P2Wins and temp2 <= 2 and temp2 != 0:
+                logging.debug(p2Name + ' wins round')                
                 P2Wins = temp2
         except:
-            continue
-        time.sleep(0.5) # sleep 5 seconds
+            logging.debug(sys.exc_info()[0])
+            break
+        time.sleep(0.5) # sleep 0.5 seconds
     
     # Printing fight results after a winner is determined
     # Below is the logic for eliminating the loser and finding a replacement
@@ -86,34 +90,34 @@ while True:
     # If the index of the new fighter is >= the number of players, terminate program
     print(str(P1Wins) + ' : ' + str(P2Wins))
     if P1Wins == P2Wins:
-        print('Tie! Rematch!')
+        logging.debug('Tie! Rematch!')        
     elif P1Wins > P2Wins: 
-        print(p1Name + ' wins')
+        logging.debug(p1Name + ' wins')        
         if p1i < p2i:
             p2i += 1
             if p2i >= numPlayers:
-                print('Done!')
+                logging.debug('Done!')                
                 exit
             p2Name = players[p2i]
         elif p2i < p1i:
             p2i = p1i + 1
             if p2i >= numPlayers:
-                print('Done!')
+                logging.debug('Done!')                
                 exit
             p2Name = players[p2i]
     else:
-        print(p2Name + ' wins')
+        logging.debug(p2Name + ' wins')        
         if p1i < p2i:
             p1i = p2i + 1
             if p1i >= numPlayers:
-                print('Done!')
+                logging.debug('Done!')                
                 exit
             p1Name = players[p1i]
         elif p2i < p1i:
             p1i += 1
             if p1i >= numPlayers:
-                print('Done!')
+                logging.debug('Done!')                
                 exit
             p1Name = players[p1i]
-    print('--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight
+    logging.debug('--------------') # a spacer to make things more readable between fights, we now loop back to start a new fight
 

@@ -110,21 +110,21 @@ def updateCharScore(winner, loser, debugOutputArea, fightHistoryArea):
     mycursor = mydb.cursor()
     winnerScore = getCharScore(winner, debugOutputArea)
     loserScore = getCharScore(loser, debugOutputArea)
-    winnerNewScore = winnerScore + K*(1 - 0)
-    loserNewScore = loserScore + K*(0 - 1)
+    p1ChanceOfWinning = (1.0 / (1.0 + pow(10, ((loserScore - winnerScore) / 400))))
+    p2ChanceOfWinning = (1.0 / (1.0 + pow(10, ((winnerScore - loserScore) / 400))))
+    winnerNewScore = winnerScore + K*(1 - p1ChanceOfWinning)
+    loserNewScore = loserScore + K*(0 - p2ChanceOfWinning)
 
-    mycursor.execute("UPDATE chars SET elo = " + str(winnerNewScore) + " WHERE name = '" + winner  + "';")
+    mycursor.execute("UPDATE chars SET elo = " + str(int(winnerNewScore)) + " WHERE name = '" + winner  + "';")
     mydb.commit()
-    mycursor.execute("UPDATE chars SET elo = " + str(loserNewScore) + " WHERE name = '" + loser  + "';")
+    mycursor.execute("UPDATE chars SET elo = " + str(int(loserNewScore)) + " WHERE name = '" + loser  + "';")
     mydb.commit()
 
-    fightHistoryArea.insert(tk.END, winner + ' +' + str((winnerNewScore - winnerScore)) + '\n')
-    fightHistoryArea.insert(tk.END, loser + ' ' + str((loserNewScore - loserScore)) + '\n')
+    fightHistoryArea.insert(tk.END, winner + ' +' + str(int(winnerNewScore - winnerScore)) + ", " + str(int(winnerNewScore)) + '\n')
+    fightHistoryArea.insert(tk.END, loser + ' ' + str(int(loserNewScore - loserScore)) + ", " + str(int(loserNewScore)) + '\n')
     fightHistoryArea.see(tk.END)
 
     debugOutputArea.insert(tk.END, 'Updating Scores\n')
-    debugOutputArea.insert(tk.END, winner + " oldScore:newScore" + str(winnerScore) + ":" + str(winnerNewScore) + '\n')
-    debugOutputArea.insert(tk.END, loser + " oldScore:newScore" + str(loserScore) + ":" + str(loserNewScore) + '\n')
+    debugOutputArea.insert(tk.END, winner + " oldScore:newScore" + str(int(winnerScore)) + ":" + str(int(winnerNewScore)) + '\n')
+    debugOutputArea.insert(tk.END, loser + " oldScore:newScore" + str(int(loserScore)) + ":" + str(int(loserNewScore)) + '\n')
     debugOutputArea.see(tk.END)
-
-    return True

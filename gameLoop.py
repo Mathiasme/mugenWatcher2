@@ -1,4 +1,3 @@
-import math
 import time
 import subprocess
 import pymem.process
@@ -41,8 +40,9 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
         p2ChanceOfWinning = (1.0 / (1.0 + pow(10, ((p1Elo - p2Elo) / 400))))
 
         fightHistoryArea.insert(tk.END, p1Name + ' - vs - ' + p2Name + '\n')
-        fightHistoryArea.insert(tk.END, '(Elo:' + str(p1Elo) + ", Win Chance: " + str(math.trunc(p1ChanceOfWinning * 100)) + '%)- vs -(' + str(math.trunc(p2ChanceOfWinning * 100)) + '% Win Chance, ' + str(p2Elo) + ' Elo)\n')
+        fightHistoryArea.insert(tk.END, '(Elo:' + str(p1Elo) + ", Win Chance: " + str(int(p1ChanceOfWinning * 100)) + '%)- vs -(' + str(int(p2ChanceOfWinning * 100)) + '% Win Chance, ' + str(p2Elo) + ' Elo)\n')
         fightHistoryArea.see(tk.END)
+        
         # calculating our addresses, win_address changes each time mugen.exe is re-run (after every matchup)
         win_address = pm.read_int(base_address + win_address_offset)
         p1_win_address = win_address + red_offset
@@ -62,14 +62,13 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
                 temp = pm.read_int(p1_win_address)
                 temp2 = pm.read_int(p2_win_address)         
                 if temp != P1Wins and temp <= 2 and temp != 0: # if we successfully read both values, let's save them
-                    fightHistoryArea.insert(tk.END, p1Name + ' wins round' + '\n')
-                    fightHistoryArea.see(tk.END)
+                    db.updateCharScore(p1Name, p2Name, debugOutputArea, fightHistoryArea)
                     P1Wins = temp
                 if temp2 != P2Wins and temp2 <= 2 and temp2 != 0:
-                    fightHistoryArea.insert(tk.END, p2Name + ' wins round' + '\n')
-                    fightHistoryArea.see(tk.END)
+                    db.updateCharScore(p2Name, p1Name, debugOutputArea, fightHistoryArea)
                     P2Wins = temp2
-            except:
+            except Exception as e:
+                print(e)
                 break
             try:  
                 infoWindowFrame.update()
@@ -87,10 +86,8 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
         if P1Wins == P2Wins:
             fightHistoryArea.insert(tk.END, 'Tie!' + '\n')
         elif P1Wins > P2Wins: 
-            db.updateCharScore(p1Name, p2Name, debugOutputArea, fightHistoryArea)
             fightHistoryArea.insert(tk.END, p1Name + ' wins' + '\n')
         else:
-            db.updateCharScore(p2Name, p1Name, debugOutputArea, fightHistoryArea)
             fightHistoryArea.insert(tk.END, p2Name + ' wins' + '\n')
-        fightHistoryArea.insert(tk.END, '--------------\n') # a spacer to make things more readable between fights, we now loop back to start a new fight
+        fightHistoryArea.insert(tk.END, '--------------\n\n\n') # a spacer to make things more readable between fights, we now loop back to start a new fight
         fightHistoryArea.see(tk.END)

@@ -1,13 +1,11 @@
 import os
 import glob
-import logging
 
 import infoWindowFrame as iwf
 import fightHistoryArea as fha
 import gameLoop as gl
 import debugOutputArea as doa
-
-logging.basicConfig(filename='debug.txt', encoding='utf-8', level=logging.DEBUG)
+import dbAccess as db
 
 baseDir = os.getcwd()
 #baseDir = r'C:\\Users\Owner\Downloads\TC'
@@ -38,4 +36,8 @@ if __name__ == '__main__':
     infoWindowFrame = iwf.createFrame()
     fightHistoryArea = fha.create(infoWindowFrame)
     debugOutputArea = doa.create(infoWindowFrame)
-    gl.start(p1Name, p2Name, stages, p1i, p2i, infoWindowFrame, fightHistoryArea, base_address, win_address_offset, red_offset, blue_offset, numPlayers, players, debugOutputArea)
+    #db.dropTable(debugOutputArea)
+    #db.createTable(debugOutputArea)
+    for p in players:
+        db.addNewChar(p, debugOutputArea)
+    gl.start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_offset, red_offset, blue_offset, numPlayers, debugOutputArea)

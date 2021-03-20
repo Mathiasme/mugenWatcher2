@@ -98,6 +98,23 @@ def getCharScore(charName, debugOutputArea):
     else:
         return myresult[0][0]
 
+def getCharRank(charName, debugOutputArea):
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="mugenmaster",
+        password="mastermugenpassword",
+        database="mugen"
+    )
+
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT s1.theRank FROM (select name, row_number() OVER (order by elo desc) as theRank from chars c order by theRank) s1 WHERE s1.name = '" + charName + "';")
+    myresult = mycursor.fetchall()
+
+    debugOutputArea.insert(tk.END, charName + ' rank is ' + str(myresult[0][0]) + '\n')
+    debugOutputArea.see(tk.END)
+
+    return myresult[0][0]
+
 def updateCharScore(winner, loser, debugOutputArea, fightHistoryArea):
     mydb = mysql.connector.connect(
         host="localhost",

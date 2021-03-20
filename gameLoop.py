@@ -41,11 +41,14 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
         p1ChanceOfWinning = (1.0 / (1.0 + pow(10, ((p2Elo - p1Elo) / 400))))
         p2ChanceOfWinning = (1.0 / (1.0 + pow(10, ((p1Elo - p2Elo) / 400))))
 
+        p1Rank = db.getCharRank(p1Name, debugOutputArea)
+        p2Rank = db.getCharRank(p2Name, debugOutputArea)
+
         fightHistoryArea.insert(tk.END, p1Name + '\n')
-        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p1Elo) + ' | ' + str(int(p1ChanceOfWinning * 100)) + '%\n')
+        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p1Elo) + ' | ' + str(int(round(p1ChanceOfWinning * 100))) + '% | Rank: #' + str(p1Rank) + '\n')
         fightHistoryArea.insert(tk.END, ' - vs - ' + '\n')
         fightHistoryArea.insert(tk.END, p2Name + '\n')
-        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p2Elo) + ' | ' + str(int(p2ChanceOfWinning * 100)) + '%\n')
+        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p2Elo) + ' | ' + str(int(round(p2ChanceOfWinning * 100))) + '% | Rank: #' + str(p2Rank) + '\n')
         fightHistoryArea.see(tk.END)
         
         # calculating our addresses, win_address changes each time mugen.exe is re-run (after every matchup)
@@ -87,12 +90,10 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
         # Below is the logic for eliminating the loser and finding a replacement
         # We just keep sliding the pointer indexes to the right, going through every character
         # If the index of the new fighter is >= the number of players, terminate program
-        fightHistoryArea.insert(tk.END, str(P1Wins) + ' : ' + str(P2Wins) + '\n')
         if P1Wins == P2Wins:
             fightHistoryArea.insert(tk.END, 'Tie!' + '\n')
         elif P1Wins > P2Wins: 
             fightHistoryArea.insert(tk.END, p1Name + ' wins' + '\n')
         else:
             fightHistoryArea.insert(tk.END, p2Name + ' wins' + '\n')
-        fightHistoryArea.insert(tk.END, '--------------\n\n\n') # a spacer to make things more readable between fights, we now loop back to start a new fight
         fightHistoryArea.see(tk.END)

@@ -42,10 +42,10 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
         p2ChanceOfWinning = (1.0 / (1.0 + pow(10, ((p1Elo - p2Elo) / 400))))
 
         fightHistoryArea.insert(tk.END, p1Name + '\n')
-        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p1Elo) + ', ' + str(int(p1ChanceOfWinning * 100)) + '%)\n')
+        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p1Elo) + ' | ' + str(int(p1ChanceOfWinning * 100)) + '%\n')
         fightHistoryArea.insert(tk.END, ' - vs - ' + '\n')
         fightHistoryArea.insert(tk.END, p2Name + '\n')
-        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p2Elo) + ', ' + str(int(p2ChanceOfWinning * 100)) + '%)\n')
+        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p2Elo) + ' | ' + str(int(p2ChanceOfWinning * 100)) + '%\n')
         fightHistoryArea.see(tk.END)
         
         # calculating our addresses, win_address changes each time mugen.exe is re-run (after every matchup)

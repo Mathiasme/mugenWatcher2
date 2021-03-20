@@ -108,6 +108,7 @@ def updateCharScore(winner, loser, debugOutputArea, fightHistoryArea):
 
     K = 32
     mycursor = mydb.cursor()
+    
     winnerScore = getCharScore(winner, debugOutputArea)
     loserScore = getCharScore(loser, debugOutputArea)
     p1ChanceOfWinning = (1.0 / (1.0 + pow(10, ((loserScore - winnerScore) / 400))))

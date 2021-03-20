@@ -22,13 +22,15 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
     # loop advances
     while True:
 
+        fightHistoryArea.delete(0.0, tk.END)
+
         p1Name = db.getRandChar(debugOutputArea)
         p2Name = db.getContender(p1Name, debugOutputArea)
 
         stage = random.choice(stages)
 
         # open our target process with the fight parameters
-        subprocess.Popen("mugen.exe -p1 \"" + p1Name + "\" -p2 \"" + p2Name +"\"" + "-rounds 2 -p1.life 1200 -p2.life 1200 -p1.ai 9 -p2.ai 9 -s \"" + stage + "\"")
+        subprocess.Popen("mugen.exe -p1 \"" + p1Name + "\" -p2 \"" + p2Name +"\"" + "-rounds 1 -p1.life 1200 -p2.life 1200 -p1.ai 9 -p2.ai 9 -s \"" + stage + "\"")
 
         time.sleep(1) # sleep for a second after opening the process before hooking in
         pm = pymem.Pymem("mugen.exe")
@@ -39,8 +41,11 @@ def start(stages, infoWindowFrame, fightHistoryArea, base_address, win_address_o
         p1ChanceOfWinning = (1.0 / (1.0 + pow(10, ((p2Elo - p1Elo) / 400))))
         p2ChanceOfWinning = (1.0 / (1.0 + pow(10, ((p1Elo - p2Elo) / 400))))
 
-        fightHistoryArea.insert(tk.END, p1Name + ' - vs - ' + p2Name + '\n')
-        fightHistoryArea.insert(tk.END, '(Elo:' + str(p1Elo) + ", Win Chance: " + str(int(p1ChanceOfWinning * 100)) + '%)- vs -(' + str(int(p2ChanceOfWinning * 100)) + '% Win Chance, ' + str(p2Elo) + ' Elo)\n')
+        fightHistoryArea.insert(tk.END, p1Name + '\n')
+        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p1Elo) + ', ' + str(int(p1ChanceOfWinning * 100)) + '%)\n')
+        fightHistoryArea.insert(tk.END, ' - vs - ' + '\n')
+        fightHistoryArea.insert(tk.END, p2Name + '\n')
+        fightHistoryArea.insert(tk.END, 'Elo: ' + str(p2Elo) + ', ' + str(int(p2ChanceOfWinning * 100)) + '%)\n')
         fightHistoryArea.see(tk.END)
         
         # calculating our addresses, win_address changes each time mugen.exe is re-run (after every matchup)

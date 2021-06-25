@@ -1,5 +1,6 @@
 import os
 import glob
+import time
 
 import infoWindowFrame as iwf
 import fightHistoryArea as fha
@@ -10,14 +11,22 @@ import dbAccess as db
 baseDir = os.getcwd()
 #baseDir = r'C:\\Users\Owner\Downloads\TC'
 os.chdir(baseDir) # simply setting our working directory explicitly. Unsure if this is needed.
-
-charsDir = baseDir + r'\chars' # folder that holds all the figher files
-players = os.listdir(charsDir) # an array of all fighter names
+charsDir = baseDir + r'\chars' # folder that holds all the fighter files
+list = os.listdir(charsDir) # an array of all fighter names
+#Allow for an access to characters .def files in folder (which was my default mugen configuration) 
+#Avoid adding none-folder filenames to the list (such as the readme.txt)
+players=[]
+for i in list:
+    if os.path.isdir(baseDir + r'\chars' + '\\' + i):
+        players.append(i)  
 numPlayers = len(players)
 
 stagesDir = baseDir + r'\stages' # stages folder
 os.chdir(stagesDir) # change our working directory temporarily to use glob
-stages = glob.glob('*.def') # this gets all ".def" files in the stages folder
+stages=[]
+stagesList = glob.glob('*.def') # this gets all ".def" files in the stages folder
+for stage in stagesList: #Take off ".def" extension to avoid "stage.def.def" output
+    stages.append(os.path.splitext(stage)[0])
 os.chdir(baseDir) # revert our working directory
 
 p1i = 0 # player 1's array index
